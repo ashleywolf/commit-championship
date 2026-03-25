@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Commit Championship</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --arena-dark: #040611;
+      --neon-pink: #ff4fd8;
+      --neon-blue: #52f3ff;
+      --gold: #ffd447;
+      --text: #f6f7ff;
+      --card: rgba(9, 12, 25, 0.85);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top, #0c1124, #030410 60%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+
+    .global-spotlight {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% -10%, rgba(120, 180, 255, 0.2), transparent 50%),
+        radial-gradient(circle at 10% 0%, rgba(255, 80, 200, 0.18), transparent 40%),
+        radial-gradient(circle at 90% 0%, rgba(80, 200, 255, 0.18), transparent 40%);
+      filter: blur(40px);
+      opacity: 0.7;
+      pointer-events: none;
+      z-index: 0;
+      animation: pulse 12s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        opacity: 0.5;
+      }
+      50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0.5;
+      }
+    }
+
+    main {
+      width: 100%;
+      max-width: 1280px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .panel {
+      background: linear-gradient(145deg, rgba(8, 11, 24, 0.96), rgba(2, 3, 10, 0.9));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: clamp(1.5rem, 3vw, 3rem);
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+
+    #intro {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    #intro.collapsed {
+      display: none;
+    }
+
+    .tagline {
+      font-family: 'Press Start 2P', cursive;
+      letter-spacing: 0.2em;
+      font-size: 0.75rem;
+      color: var(--neon-blue);
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-family: 'Press Start 2P', cursive;
+      font-size: clamp(1.5rem, 6vw, 2.5rem);
+      margin: 0 0 1rem;
+      text-shadow: 0 0 15px rgba(82, 243, 255, 0.6);
+    }
+
+    .lead {
+      max-width: 700px;
+      margin: 0 auto 1.5rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    form {
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    label {
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      margin-top: 0.5rem;
+      border-radius: 16px;
+      background: rgba(5, 6, 15, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 0.75rem 1rem;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .input-row span {
+      font-family: 'Press Start 2P', cursive;
+      color: rgba(255, 255, 255, 0.5);
+      margin-right: 0.5rem;
+      font-size: 1rem;
+    }
+
+    input {
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 1.1rem;
+      color: #fff;
+      flex: 1;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 1.25rem;
+      border: none;
+      border-radius: 50px;
+      padding: 0.95rem 1.2rem;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-family: 'Press Start 2P', cursive;
+      color: #05060f;
+      background: linear-gradient(120deg, var(--neon-blue), var(--neon-pink));
+      box-shadow: 0 10px 35px rgba(82, 243, 255, 0.4);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 45px rgba(255, 79, 216, 0.4);
+    }
+
+    button.secondary {
+      background: linear-gradient(120deg, #1c2337, #0b0f1f);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: none;
+    }
+
+    .status {
+      min-height: 1.5rem;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    #reveal {
+      margin-top: 2rem;
+    }
+
+    #reveal.hidden {
+      display: none;
+    }
+
+    .arena {
+      position: relative;
+      min-height: 650px;
+      overflow: hidden;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: radial-gradient(circle at 50% 20%, rgba(80, 120, 255, 0.25), transparent 45%),
+        rgba(2, 4, 10, 0.95);
+      padding: clamp(1rem, 2vw, 2rem);
+    }
+
+    .arena::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 40%, rgba(0, 0, 0, 0.6));
+      pointer-events: none;
+    }
+
+    .arena-backdrop,
+    .smoke-haze,
+    .lens-flare,
+    #pyroCanvas,
+    .belt-canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .lens-flare {
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.25), transparent 60%);
+      mix-blend-mode: screen;
+      opacity: 0.3;
+      filter: blur(10px);
+      animation: flare 12s ease-in-out infinite;
+    }
+
+    .flare-left {
+      left: 10%;
+      top: 10%;
+      width: 200px;
+      height: 200px;
+    }
+
+    .flare-right {
+      right: 8%;
+      top: 20%;
+      width: 150px;
+      height: 150px;
+      animation-delay: 4s;
+    }
+
+    @keyframes flare {
+      0% {
+        transform: scale(0.8);
+        opacity: 0.2;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 0.45;
+      }
+      100% {
+        transform: scale(0.8);
+        opacity: 0.2;
+      }
+    }
+
+    .smoke-haze {
+      background: radial-gradient(circle at 50% 90%, rgba(15, 18, 30, 0), rgba(15, 18, 30, 0.9) 65%);
+      animation: haze 18s linear infinite;
+    }
+
+    @keyframes haze {
+      0% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(15px);
+      }
+      100% {
+        transform: translateY(0px);
+      }
+    }
+
+    .poster-frame {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65);
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    #posterCanvas {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    #pyroCanvas {
+      mix-blend-mode: screen;
+      z-index: 4;
+    }
+
+    #beltCanvas.belt-canvas {
+      width: min(90%, 900px);
+      height: auto;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3;
+      opacity: 0.95;
+    }
+
+    .announcer-text {
+      position: absolute;
+      top: 5%;
+      width: 100%;
+      text-align: center;
+      z-index: 5;
+      padding: 0 1rem;
+    }
+
+    .intro-line {
+      font-family: 'Press Start 2P', cursive;
+      letter-spacing: 0.3em;
+      font-size: clamp(0.9rem, 3vw, 1.2rem);
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 1rem;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .intro-line.lit {
+      opacity: 1;
+      transform: translateY(0);
+      color: var(--neon-blue);
+    }
+
+    #calloutList {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    .callout {
+      background: rgba(4, 6, 16, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 0.75rem 1rem;
+      min-width: 220px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.68rem;
+      line-height: 1.4;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #d9e6ff;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      transition: transform 0.4s ease, opacity 0.4s ease;
+      opacity: 1;
+    }
+
+    .callout.hidden {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+
+    .callout.revealed {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+      box-shadow: 0 12px 30px rgba(82, 243, 255, 0.25);
+    }
+
+    .callout-label {
+      display: block;
+      font-size: 0.6rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .callout-value {
+      display: block;
+      color: #fff;
+    }
+
+    .title-card {
+      position: absolute;
+      top: 15%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(120deg, rgba(255, 255, 255, 0.1), rgba(82, 243, 255, 0.3));
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 0.75rem 2rem;
+      border-radius: 12px;
+      font-family: 'Press Start 2P', cursive;
+      letter-spacing: 0.25em;
+      font-size: clamp(0.9rem, 3vw, 1.1rem);
+      color: #fff;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      z-index: 5;
+      opacity: 0;
+    }
+
+    .title-card.slam {
+      animation: slam 0.8s ease forwards;
+    }
+
+    @keyframes slam {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -60%) scale(0.8);
+      }
+      60% {
+        opacity: 1;
+        transform: translate(-50%, -45%) scale(1.08);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .controls button {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .poster-caption {
+      text-align: center;
+      text-transform: uppercase;
+      font-family: 'Press Start 2P', cursive;
+      letter-spacing: 0.2em;
+      margin: 0.5rem 0 1rem;
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    .arena.shake {
+      animation: shake 0.6s linear;
+    }
+
+    @keyframes shake {
+      0% {
+        transform: translate(2px, -2px);
+      }
+      20% {
+        transform: translate(-4px, 2px);
+      }
+      40% {
+        transform: translate(4px, -1px);\n      }
+      60% {
+        transform: translate(-3px, 1px);
+      }
+      80% {
+        transform: translate(2px, -2px);
+      }
+      100% {
+        transform: translate(0, 0);
+      }
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 1.25rem;
+      }
+      .controls {
+        flex-direction: column;
+      }
+      .panel {
+        padding: 1.5rem;
+      }
+      #calloutList {
+        flex-direction: column;
+        align-items: center;
+      }
+      #beltCanvas.belt-canvas {
+        width: 100%;
+      }
+      .title-card {
+        letter-spacing: 0.15em;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="global-spotlight"></div>
+  <main id="experience">
+    <section id="intro" class="panel show">
+      <div class="intro-content">
+        <p class="tagline">COMMIT CHAMPIONSHIP</p>
+        <h1>ENTER THE RING</h1>
+        <p class="lead">Summon a GitHub belt poster with neon lights, pyro, and an announcer that feeds on real profile stats.</p>
+        <form id="usernameForm">
+          <label for="username">GitHub Username</label>
+          <div class="input-row">
+            <span>@</span>
+            <input id="username" name="username" type="text" placeholder="octocat" autocomplete="off" required />
+          </div>
+          <button type="submit" id="igniteBtn">Light the Pyro</button>
+        </form>
+        <p id="statusMessage" class="status"></p>
+      </div>
+    </section>
+
+    <section id="reveal" class="panel hidden" aria-live="polite">
+      <div class="arena" id="arenaStage">
+        <div class="lens-flare flare-left"></div>
+        <div class="lens-flare flare-right"></div>
+        <div class="smoke-haze"></div>
+        <div class="poster-frame">
+          <canvas id="posterCanvas" width="1200" height="630" aria-label="championship poster"></canvas>
+        </div>
+        <canvas id="beltCanvas" class="belt-canvas" width="900" height="320" aria-hidden="true"></canvas>
+        <canvas id="pyroCanvas"></canvas>
+        <div class="announcer-text">
+          <p id="introLine" class="intro-line">INTRODUCING...</p>
+          <ul id="calloutList"></ul>
+        </div>
+        <div id="titleCard" class="title-card">DEFENDING CHAMPION</div>
+        <p class="poster-caption">Shareable Championship Poster</p>
+        <div class="controls">
+          <button type="button" id="saveBtn">Save Image</button>
+          <button type="button" id="copyBtn">Copy</button>
+          <button type="button" id="shareBtn">Share</button>
+          <button type="button" id="resetBtn" class="secondary">New Challenger</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <template id="calloutTemplate">
+    <li class="callout hidden">
+      <span class="callout-label"></span>
+      <span class="callout-value"></span>
+    </li>
+  </template>
+
+  <script>
+    (() => {
+      const form = document.getElementById('usernameForm');
+      const usernameInput = document.getElementById('username');
+      const statusMessage = document.getElementById('statusMessage');
+      const intro = document.getElementById('intro');
+      const reveal = document.getElementById('reveal');
+      const arenaStage = document.getElementById('arenaStage');
+      const calloutList = document.getElementById('calloutList');
+      const calloutTemplate = document.getElementById('calloutTemplate');
+      const introLine = document.getElementById('introLine');
+      const titleCard = document.getElementById('titleCard');
+      const saveBtn = document.getElementById('saveBtn');
+      const copyBtn = document.getElementById('copyBtn');
+      const shareBtn = document.getElementById('shareBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const pyroCanvas = document.getElementById('pyroCanvas');
+      const pyroCtx = pyroCanvas.getContext('2d');
+      const beltCanvas = document.getElementById('beltCanvas');
+      const beltCtx = beltCanvas.getContext('2d');
+      const posterCanvas = document.getElementById('posterCanvas');
+      const posterCtx = posterCanvas.getContext('2d');
+
+      const tiers = [
+        {
+          name: 'UNDISPUTED',
+          label: 'UNDISPUTED CHAMPION',
+          minRepos: 150,
+          minStars: 5000,
+          pyro: 150,
+          palette: { base: '#7efaff', highlight: '#f7ffff', strap: '#050812', accent: '#c8f8ff' }
+        },
+        {
+          name: 'GRAND CHAMPION',
+          label: 'GRAND CHAMPION',
+          minRepos: 80,
+          minStars: 1000,
+          pyro: 110,
+          palette: { base: '#d8f0ff', highlight: '#ffffff', strap: '#0d1522', accent: '#a3dcff' }
+        },
+        {
+          name: 'CHAMPION',
+          label: 'DEFENDING CHAMPION',
+          minRepos: 30,
+          minStars: 200,
+          pyro: 80,
+          palette: { base: '#f7c948', highlight: '#fff5c3', strap: '#241603', accent: '#ffd86b' }
+        },
+        {
+          name: 'CONTENDER',
+          label: 'RISING CONTENDER',
+          minRepos: 10,
+          minStars: 50,
+          pyro: 50,
+          palette: { base: '#c0c9d8', highlight: '#fdfdff', strap: '#1b1f2c', accent: '#d9e7ff' }
+        },
+        {
+          name: 'NEWCOMER',
+          label: 'NEWCOMER SHOWCASE',
+          minRepos: 0,
+          minStars: 0,
+          pyro: 15,
+          palette: { base: '#c06c2b', highlight: '#f2c18d', strap: '#2b1206', accent: '#ffd19b' }
+        }
+      ];
+
+      const beltState = {
+        username: 'CHALLENGER',
+        tier: tiers[tiers.length - 1],
+        shine: 0,
+        stats: { repos: 0, stars: 0, age: 0 }
+      };
+
+      let pyroParticles = [];
+      let pyroInterval = null;
+      let posterURL = null;
+      let audioCtx = null;
+
+      function setStatus(message, isError = false) {
+        statusMessage.textContent = message;
+        statusMessage.style.color = isError ? '#ff8ca1' : 'rgba(255, 255, 255, 0.8)';
+      }
+
+      function delay(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      function ensureAudio() {
+        if (!audioCtx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            audioCtx = new AudioContext();
+          }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        return audioCtx;
+      }
+
+      function playCrowd(intensity = 0.4) {
+        const ctx = ensureAudio();
+        if (!ctx) return;
+        const bufferSize = ctx.sampleRate * 1.5;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.max(0.1, intensity);
+        }
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 500;
+        noise.connect(filter).connect(ctx.destination);
+        noise.start();
+        noise.stop(ctx.currentTime + 1.5);
+      }
+
+      function playHorn() {
+        const ctx = ensureAudio();
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.value = 220;
+        gain.gain.setValueAtTime(0.001, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.4, ctx.currentTime + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 1);
+      }
+
+      function playImpact() {
+        const ctx = ensureAudio();
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.value = 80;
+        gain.gain.setValueAtTime(0.4, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+      }
+
+      function playPyroSound() {
+        const ctx = ensureAudio();
+        if (!ctx) return;
+        const bufferSize = ctx.sampleRate * 0.6;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 1500;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.5, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+        noise.connect(filter).connect(gain).connect(ctx.destination);
+        noise.start();
+        noise.stop(ctx.currentTime + 0.6);
+      }
+
+      function playVictoryTheme() {
+        const ctx = ensureAudio();
+        if (!ctx) return;
+        const notes = [261.63, 329.63, 392.0, 523.25];
+        notes.forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          const gain = ctx.createGain();
+          gain.gain.setValueAtTime(0.001, ctx.currentTime + i * 0.15);
+          gain.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + i * 0.15 + 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.5);
+          osc.connect(gain).connect(ctx.destination);
+          osc.start(ctx.currentTime + i * 0.15);
+          osc.stop(ctx.currentTime + i * 0.15 + 0.5);
+        });
+      }
+
+      function formatNumber(num) {
+        if (num < 1000) return String(num);
+        if (num < 1000000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+        return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+      }
+
+      function calcAccountAgeYears(createdAt) {
+        const diff = Date.now() - new Date(createdAt).getTime();
+        const years = diff / (1000 * 60 * 60 * 24 * 365);
+        return years < 1 ? '<1' : years.toFixed(1);
+      }
+
+      function calcPrimaryLanguage(repos) {
+        const counts = repos.reduce((acc, repo) => {
+          if (repo.language) {
+            acc[repo.language] = (acc[repo.language] || 0) + 1;
+          }
+          return acc;
+        }, {});
+        const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+        return sorted[0]?.[0] || 'UNDECLARED';
+      }
+
+      function getTier(repos, stars) {
+        return (
+          tiers.find((tier) => repos >= tier.minRepos && stars >= tier.minStars) || tiers[tiers.length - 1]
+        );
+      }
+
+      function updateCallouts(lines) {
+        calloutList.innerHTML = '';
+        lines.forEach((line) => {
+          const fragment = calloutTemplate.content.cloneNode(true);
+          fragment.querySelector('.callout-label').textContent = line.label;
+          fragment.querySelector('.callout-value').textContent = line.value;
+          calloutList.appendChild(fragment);
+        });
+      }
+
+      function resizePyroCanvas() {
+        pyroCanvas.width = arenaStage.clientWidth;
+        pyroCanvas.height = arenaStage.clientHeight;
+      }
+
+      function spawnPyroBurst(intensity) {
+        if (!pyroCanvas.width || !pyroCanvas.height) return;
+        const count = Math.max(5, Math.floor(intensity / 3));
+        for (let i = 0; i < count; i++) {
+          pyroParticles.push({
+            x: Math.random() * pyroCanvas.width,
+            y: pyroCanvas.height - 20,
+            vx: (Math.random() - 0.5) * 4,
+            vy: -Math.random() * (4 + intensity / 50) - 4,
+            life: Math.random() * 0.8 + 0.7,
+            maxLife: 1.4,
+            color: Math.random() > 0.5 ? 'rgba(255,150,50,0.9)' : 'rgba(80,200,255,0.9)'
+          });
+        }
+      }
+
+      function startPyro(level) {
+        if (pyroInterval) clearInterval(pyroInterval);
+        if (level <= 0) return;
+        spawnPyroBurst(level);
+        pyroInterval = setInterval(() => spawnPyroBurst(level), level > 80 ? 200 : 400);
+      }
+
+      function pyroLoop() {
+        requestAnimationFrame(pyroLoop);
+        if (!pyroCanvas.width || !pyroCanvas.height) return;
+        pyroCtx.clearRect(0, 0, pyroCanvas.width, pyroCanvas.height);
+        pyroParticles = pyroParticles.filter((p) => {
+          p.life -= 0.02;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.12;
+          if (p.life <= 0) return false;
+          const alpha = Math.max(0, p.life / p.maxLife);
+          pyroCtx.fillStyle = p.color.replace('0.9', alpha.toFixed(2));
+          pyroCtx.beginPath();
+          pyroCtx.arc(p.x, p.y, Math.max(1, 4 * alpha), 0, Math.PI * 2);
+          pyroCtx.fill();
+          return true;
+        });
+      }
+
+      function drawRoundedRect(ctx, x, y, width, height, radius) {
+        const r = Math.min(radius, width / 2, height / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + width - r, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+        ctx.lineTo(x + width, y + height - r);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+        ctx.lineTo(x + r, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+      }
+
+      function paintBelt() {
+        const ctx = beltCtx;
+        const { width, height } = beltCanvas;
+        ctx.clearRect(0, 0, width, height);
+        const tier = beltState.tier;
+        const strapHeight = height * 0.45;
+        const strapY = (height - strapHeight) / 2;
+        const strapGradient = ctx.createLinearGradient(0, strapY, width, strapY + strapHeight);
+        strapGradient.addColorStop(0, '#050506');
+        strapGradient.addColorStop(0.5, tier.palette.strap);
+        strapGradient.addColorStop(1, '#050506');
+        ctx.fillStyle = strapGradient;
+        drawRoundedRect(ctx, 20, strapY, width - 40, strapHeight, 30);
+        ctx.fill();
+
+        const centerGradient = ctx.createLinearGradient(width / 2 - 200, height / 2 - 120, width / 2 + 200, height / 2 + 120);
+        centerGradient.addColorStop(0, tier.palette.base);
+        centerGradient.addColorStop(0.5, tier.palette.highlight);
+        centerGradient.addColorStop(1, tier.palette.base);
+        ctx.fillStyle = centerGradient;
+        ctx.strokeStyle = '#111';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.ellipse(width / 2, height / 2, 200, 120, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        const shineX = beltState.shine * width;
+        const shineGradient = ctx.createLinearGradient(shineX - 80, height / 2 - 150, shineX + 80, height / 2 + 150);
+        shineGradient.addColorStop(0, 'rgba(255,255,255,0)');
+        shineGradient.addColorStop(0.5, 'rgba(255,255,255,0.55)');
+        shineGradient.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = shineGradient;
+        ctx.beginPath();
+        ctx.ellipse(width / 2, height / 2, 200, 120, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#0a0a0a';
+        ctx.font = '18px "Space Grotesk"';
+        ctx.textAlign = 'center';
+        ctx.fillText(tier.name, width / 2, height / 2 - 40);
+        ctx.font = '28px "Press Start 2P"';
+        ctx.fillStyle = '#111';
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+        ctx.strokeText(beltState.username.toUpperCase(), width / 2, height / 2 + 10);
+        ctx.fillStyle = '#1c1c1c';
+        ctx.fillText(beltState.username.toUpperCase(), width / 2, height / 2 + 10);
+
+        const sidePositions = [width / 2 - 260, width / 2 + 260];
+        sidePositions.forEach((x, idx) => {
+          ctx.beginPath();
+          ctx.ellipse(x, height / 2, 80, 90, 0, 0, Math.PI * 2);
+          ctx.fillStyle = tier.palette.base;
+          ctx.fill();
+          ctx.strokeStyle = '#111';
+          ctx.stroke();
+          ctx.fillStyle = '#0a0a0a';
+          ctx.font = '22px "Press Start 2P"';
+          const icon = ['★', '⧈'][idx] || '⏱';
+          ctx.fillText(icon, x, height / 2 - 10);
+          ctx.font = '16px "Space Grotesk"';
+          const statText = idx === 0 ? formatNumber(beltState.stats.stars) + '★' : formatNumber(beltState.stats.repos) + ' REPOS';
+          ctx.fillText(statText, x, height / 2 + 25);
+        });
+
+        ctx.font = '16px "Space Grotesk"';
+        ctx.fillStyle = '#0a0a0a';
+        ctx.fillText(beltState.stats.age + ' yrs active', width / 2, height / 2 + 50);
+      }
+
+      function beltLoop() {
+        beltState.shine = (beltState.shine + 0.005) % 1;
+        paintBelt();
+        requestAnimationFrame(beltLoop);
+      }
+
+      function drawSpotlights(ctx, width, height) {
+        const gradient = ctx.createRadialGradient(width / 2, height * -0.1, 80, width / 2, height * 0.3, width);
+        gradient.addColorStop(0, 'rgba(90,120,255,0.35)');
+        gradient.addColorStop(1, 'rgba(5,5,15,0.2)');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(width, 0);
+        ctx.lineTo(width, height);
+        ctx.lineTo(0, height);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function drawSmoke(ctx, width, height) {
+        const gradient = ctx.createLinearGradient(0, height * 0.7, 0, height);
+        gradient.addColorStop(0, 'rgba(0,0,0,0)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0.7)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, height * 0.6, width, height * 0.4);
+      }
+
+      async function generatePoster(profile, tier, statsLines) {
+        const ctx = posterCtx;
+        const { width, height } = posterCanvas;
+        ctx.clearRect(0, 0, width, height);
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+        bgGrad.addColorStop(0, '#05060f');
+        bgGrad.addColorStop(1, '#010103');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, width, height);
+        drawSpotlights(ctx, width, height);
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        const lightGrad = ctx.createRadialGradient(width / 2, 0, 80, width / 2, 0, width);
+        lightGrad.addColorStop(0, 'rgba(80, 200, 255, 0.4)');
+        lightGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = lightGrad;
+        ctx.fillRect(0, 0, width, height / 2);
+        ctx.restore();
+
+        const avatarImg = new Image();
+        avatarImg.crossOrigin = 'anonymous';
+        avatarImg.src = profile.avatar_url + '&s=400';
+        await new Promise((resolve) => {
+          avatarImg.onload = resolve;
+          avatarImg.onerror = resolve;
+        });
+        const avatarX = width / 2;
+        const avatarY = height * 0.3;
+        const avatarRadius = 120;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(avatarX, avatarY, avatarRadius, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(
+          avatarImg,
+          avatarX - avatarRadius,
+          avatarY - avatarRadius,
+          avatarRadius * 2,
+          avatarRadius * 2
+        );
+        ctx.restore();
+        ctx.strokeStyle = tier.palette.accent;
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.arc(avatarX, avatarY, avatarRadius + 5, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.save();
+        ctx.shadowColor = 'rgba(0,0,0,0.7)';
+        ctx.shadowBlur = 20;
+        ctx.drawImage(
+          beltCanvas,
+          width / 2 - beltCanvas.width / 2,
+          height * 0.45,
+          beltCanvas.width,
+          beltCanvas.height
+        );
+        ctx.restore();
+
+        const tierGradient = ctx.createLinearGradient(0, 0, width, 0);
+        tierGradient.addColorStop(0, tier.palette.accent);
+        tierGradient.addColorStop(1, tier.palette.base);
+        ctx.font = '38px "Press Start 2P"';
+        ctx.fillStyle = tierGradient;
+        ctx.textAlign = 'center';
+        ctx.fillText(tier.label, width / 2, 70);
+
+        ctx.font = '64px "Press Start 2P"';
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+        ctx.lineWidth = 8;
+        ctx.strokeText(profile.login.toUpperCase(), width / 2, height - 50);
+        ctx.fillText(profile.login.toUpperCase(), width / 2, height - 50);
+
+        ctx.font = '24px "Space Grotesk"';
+        statsLines.forEach((line, index) => {
+          const positions = [
+            { x: 60, y: 160 },
+            { x: width - 60, y: 160, align: 'right' },
+            { x: 60, y: height - 190 },
+            { x: width - 60, y: height - 190, align: 'right' },
+            { x: width / 2, y: height - 260, align: 'center' }
+          ];
+          const pos = positions[index] || { x: width / 2, y: height - 200, align: 'center' };
+          ctx.textAlign = pos.align || 'left';
+          ctx.fillStyle = index % 2 === 0 ? '#b4c9ff' : '#ffe7a3';
+          ctx.fillText(line.value, pos.x, pos.y);
+        });
+
+        drawSmoke(ctx, width, height);
+        posterURL = posterCanvas.toDataURL('image/png');
+      }
+
+      function screenShake(duration = 600) {
+        arenaStage.classList.add('shake');
+        setTimeout(() => arenaStage.classList.remove('shake'), duration);
+      }
+
+      async function runRevealSequence(tier) {
+        introLine.classList.remove('lit');
+        introLine.textContent = 'Dim the arena...';
+        await delay(600);
+        introLine.textContent = 'INTRODUCING...';
+        introLine.classList.add('lit');
+        playCrowd(tier.pyro / 200);
+        playHorn();
+        startPyro(tier.pyro);
+        const callouts = [...calloutList.querySelectorAll('.callout')];
+        for (const callout of callouts) {
+          await delay(1000);
+          callout.classList.remove('hidden');
+          callout.classList.add('revealed');
+          playImpact();
+          spawnPyroBurst(tier.pyro);
+        }
+        await delay(1200);
+        titleCard.textContent = tier.label;
+        titleCard.classList.remove('slam');
+        void titleCard.offsetWidth;
+        titleCard.classList.add('slam');
+        playPyroSound();
+        if (tier.name === 'UNDISPUTED' || tier.name === 'GRAND CHAMPION') {
+          screenShake();
+        }
+        await delay(1000);
+        playVictoryTheme();
+      }
+
+      async function fetchProfile(username) {
+        const userResponse = await fetch(`https://api.github.com/users/${username}`);
+        if (!userResponse.ok) {
+          throw new Error('User not found');
+        }
+        const user = await userResponse.json();
+        const reposResponse = await fetch(
+          `https://api.github.com/users/${username}/repos?sort=stars&per_page=100`
+        );
+        if (!reposResponse.ok) {
+          throw new Error('Could not load repositories');
+        }
+        const repos = await reposResponse.json();
+        const totalStars = repos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
+        const primaryLanguage = calcPrimaryLanguage(repos);
+        const accountAge = calcAccountAgeYears(user.created_at);
+        return {
+          login: user.login,
+          avatar_url: user.avatar_url,
+          name: user.name || user.login,
+          followers: user.followers,
+          total_repos: user.public_repos,
+          total_stars: totalStars,
+          primary_language: primaryLanguage,
+          account_age: accountAge,
+          created_at: user.created_at,
+          followers_count: user.followers
+        };
+      }
+
+      async function startExperience(username) {
+        const clean = username.trim();
+        if (!clean) {
+          setStatus('Enter a GitHub username.');
+          return;
+        }
+        setStatus('Contacting the GitHub control room...');
+        form.classList.add('loading');
+        try {
+          const profile = await fetchProfile(clean);
+          const tier = getTier(profile.total_repos, profile.total_stars);
+          beltState.username = profile.login;
+          beltState.tier = tier;
+          beltState.stats = {
+            repos: profile.total_repos,
+            stars: profile.total_stars,
+            age: profile.account_age
+          };
+          const statsLines = [
+            { label: 'Weight', value: `Weighing in at ${profile.total_repos} REPOSITORIES!` },
+            { label: 'Stars', value: `With a devastating ${profile.total_stars} STARS!` },
+            { label: 'Division', value: `Fighting out of the ${profile.primary_language} division!` },
+            { label: 'Squad', value: `With ${profile.followers} in their corner!` },
+            { label: 'Experience', value: `${profile.account_age} years of championship experience!` }
+          ];
+          updateCallouts(statsLines);
+          resizePyroCanvas();
+          intro.classList.add('collapsed');
+          reveal.classList.remove('hidden');
+          await generatePoster(profile, tier, statsLines);
+          await runRevealSequence(tier);
+          updateURL(clean);
+          setStatus('Poster ready. Save or share the glory.');
+        } catch (error) {
+          console.error(error);
+          setStatus(error.message || 'Something went wrong with the API.', true);
+        } finally {
+          form.classList.remove('loading');
+        }
+      }
+
+      function updateURL(username) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('user', username);
+        window.history.replaceState(null, '', url.toString());
+      }
+
+      saveBtn.addEventListener('click', () => {
+        if (!posterURL) return;
+        const link = document.createElement('a');
+        link.href = posterURL;
+        link.download = 'commit-championship.png';
+        link.click();
+      });
+
+      copyBtn.addEventListener('click', () => {
+        posterCanvas.toBlob(async (blob) => {
+          if (!blob || !navigator.clipboard) return;
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({ 'image/png': blob })
+            ]);
+            setStatus('Poster copied to clipboard.');
+          } catch (err) {
+            setStatus('Clipboard copy blocked by browser.', true);
+          }
+        });
+      });
+
+      shareBtn.addEventListener('click', () => {
+        if (!navigator.share) {
+          setStatus('Sharing is not supported here.', true);
+          return;
+        }
+        posterCanvas.toBlob((blob) => {
+          if (!blob) return;
+          const file = new File([blob], 'commit-championship.png', { type: 'image/png' });
+          navigator
+            .share({
+              title: 'Commit Championship',
+              text: 'Behold the reigning GitHub champion poster.',
+              files: [file]
+            })
+            .catch(() => {});
+        });
+      });
+
+      resetBtn.addEventListener('click', () => {
+        reveal.classList.add('hidden');
+        intro.classList.remove('collapsed');
+        form.reset();
+        setStatus('Ready for a new challenger.');
+        beltState.username = 'CHALLENGER';
+        beltState.tier = tiers[tiers.length - 1];
+        beltState.stats = { repos: 0, stars: 0, age: 0 };
+        if (pyroInterval) clearInterval(pyroInterval);
+        pyroParticles = [];
+        window.history.replaceState(null, '', window.location.pathname);
+      });
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        ensureAudio();
+        startExperience(usernameInput.value);
+      });
+
+      function checkURL() {
+        const params = new URLSearchParams(window.location.search);
+        const user = params.get('user');
+        if (user) {
+          usernameInput.value = user;
+          startExperience(user);
+        }
+      }
+
+      resizePyroCanvas();
+      window.addEventListener('resize', resizePyroCanvas);
+      pyroLoop();
+      beltLoop();
+      checkURL();
+    })();
+  </script>
+</body>
+</html>
